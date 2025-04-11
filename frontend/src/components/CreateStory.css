@@ -1,0 +1,49 @@
+/* General Styling */
+body {
+  font-family: "Arial", sans-serif;
+}
+
+.create-story {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #4a4a4a;
+}
+
+/* Form Styling */
+.create-story-form {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.form-select,
+.form-textarea {
+  width: calc(100% - 20px);
+  margin-bottom: 20px;
+}
+
+.form-select {
+  padding: 10px;
+}
+
+.form-textarea {
+  padding: 10px;
+}
+
+.btn-create,
+.btn-save {
+  display: block;
+  background-color: #bea6d7; /* Gradient color */
+}

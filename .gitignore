@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.env
+.env
+
+# Virtual Envs
+myenv/
+venv/
+
+# Datasets / Large files
+datasets/
+*.zip
+*.tar
+*.gz
+
+# Node/Frontend
+node_modules/
+dist/
+build/
+
+# models folder
+models/

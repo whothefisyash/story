@@ -1,0 +1,61 @@
+.dashboard {
+    padding: 20px;
+    background-color: #f0f4ff;
+  }
+  
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 24px;
+    color: #4a4a8c;
+  }
+  
+  .credits {
+    background-color: #5a5ac8;
+    color: white;
+    padding: 10px;
+    border-radius: 20px;
+  }
+  
+  .story-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .story-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px;
+  }
+  
+  .story-card img {
+    width: 100%;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  
+  .story-card h3 {
+    padding: 10px;
+  }
+  
+  .read-now {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 10px 20px;
+    background-color: #5a5ac8;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  
+  .read-now:hover {
+    background-color: #4a4a8c; /* Darker purple on hover */
+  }
+  

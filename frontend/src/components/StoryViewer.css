@@ -1,0 +1,120 @@
+.story-viewer {
+  padding: 20px;
+  background-color: #f0f4ff; /* Light blue background */
+  min-height: 100vh; /* Full height for the page */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.story-viewer h1 {
+  font-size: 32px; /* Slightly larger font for better readability */
+  color: #4a4a8c; /* Dark purple */
+  text-align: center;
+  margin-bottom: 30px; /* Increased spacing below the title */
+}
+
+.story-viewer img {
+  display: block;
+  margin: auto;
+  max-width: 90%; /* Increased width for larger images */
+  max-height: 400px; /* Limit height to prevent overflow */
+  border-radius: 15px; /* Rounded corners for a modern look */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow effect */
+}
+
+.story-viewer p {
+  font-size: 20px; /* Larger font size for better readability */
+  color: #4a4a8c; /* Dark purple */
+  text-align: justify;
+  margin-top: 20px;
+  line-height: 1.6; /* Improved line spacing for readability */
+}
+
+@media (max-width: 768px) {
+  .story-viewer img {
+    max-width: 100%; /* Adjust image width for smaller screens */
+    max-height: auto; /* Allow image height to adjust dynamically */
+    border-radius: 10px; /* Slightly smaller rounded corners on mobile */
+  }
+
+  .story-viewer h1 {
+    font-size: 24px; /* Smaller font size for smaller screens */
+    margin-bottom: 20px;
+  }
+
+  .story-viewer p {
+    font-size: 16px; /* Adjust text size for smaller screens */
+    line-height: 1.4;
+    margin-top: 15px;
+    padding: 10px; /* Add padding for better spacing on mobile devices */
+    text-align: left; /* Align text to left on smaller screens */
+ }
+}
+
+.tts-controls {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tts-controls button,
+.tts-controls select,
+.tts-controls .download-btn {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+}
+
+.tts-controls button {
+  background-color: #4CAF50; /* Green */
+  color: white;
+  border: none;
+}
+
+.tts-controls button:hover {
+  background-color: #45a049;
+}
+
+.tts-controls .download-btn {
+  background-color: #2196F3; /* Blue */
+  color: white;
+  text-decoration: none;
+}
+
+.tts-controls .download-btn:hover {
+  background-color: #0b7dda;
+}
+
+.quiz-section {
+  margin-top: 20px;
+}
+
+.quiz-question {
+  margin-bottom: 15px;
+}
+
+.quiz-question button {
+  padding: 10px;
+  margin-right: 10px;
+  border-radius: 5px;
+}
+
+.quiz-question button.selected {
+  background-color: #4CAF50; /* Green for selected */
+}
+
+.submit-quiz-btn {
+  padding: 10px;
+  background-color: #2196F3; /* Blue */
+  color: white;
+}
+
+.quiz-results {
+  margin-top: 20px;
+}
+
+.quiz-results p {
+  margin-bottom: 10px;
+}

@@ -1,0 +1,30 @@
+1) Storybook Generator
+
+Generates two types of stories:
+○Bedtime Stories
+○Educational Stories
+
+User Input:
+A short 2-line description of the story.
+Option to select a moral from a dropdown (if they want a moral-based story).
+Clicks on the "Create" button.
+
+Output:
+A picture book with page flip animation.
+Left page: Colorful illustrations.
+Right page: Story text.
+
+Additional Features:
+○Save generated books so users can read them again later.
+○Text-to-Speech (TTS) integration to read the book aloud using any TTS engine.
+○Download option to save the generated book as a PDF.
+○Interactive Quiz at the End to keep children engaged:
+○Moral-based question (e.g., "What is the moral of the story?").
+○Meaning of important keywords from the story.
+○Character-related questions (e.g., "What was the name of the main character?").
+
+https://youtu.be/bxhDP-e4NDA?si=sX5bTSRDT1_69-Tf
+
+We want a similar UI. You can watch it at 3:36:05 in the video
+
+
