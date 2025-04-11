@@ -1,3 +1,5 @@
+# D:\Ahh\Projects\story\backend\routes.py
+
 from flask import Blueprint, jsonify, request
 from flask import send_from_directory
 from flask import send_file
@@ -18,6 +20,8 @@ DATABASE = "skibidi_story.db"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 GENERATED_IMAGES_DIR = os.path.join(BASE_DIR, "../generated_images")
 
+assets_manager=StoryAssetsManager()
+
 # Create a Blueprint for routes
 routes = Blueprint('routes', __name__)
 
@@ -30,55 +34,40 @@ def home():
 
 @routes.route('/generate_story', methods=['POST'])
 def generate_story_endpoint():
-    """
-    Endpoint to generate a story with images.
-    Expected input: JSON with 'description', 'storyType', and optional 'moral'.
-    """
     data = request.get_json()
     description = data.get('description')
-    story_type = data.get('storyType', 'Bedtime')  # Default to Bedtime if not provided
-    moral = data.get('moral', None)
-
+    story_type = data.get('storyType', 'Bedtime')
+    moral = data.get('moral')
+    
     if not description:
         return jsonify({"error": "Description is required"}), 400
 
     try:
-        # Generate story using the utility function
-        print(f"Generating story with prompt: '{description}', type: '{story_type}', moral: '{moral}'")
+        # Generate story content
         story_content = generate_story(description, story_type, moral)
-
-        # Split story into pages (e.g., 2 sentences per page)
-        sentences = story_content.split(". ")
-        sentences = [s.strip() for s in sentences if s.strip()]  # Remove empty sentences
-        pages = [{"text": sentences[i], "image_prompt": sentences[i]} for i in range(len(sentences))]
-
-        # Save images in a single directory
-        image_dir = f"D:/Ahh/Projects/story/backend/static/generated_images/"
-        os.makedirs(image_dir, exist_ok=True)
-
+        story_id = data.get('id') or f"story_{int(time.time())}_{random.randint(1000, 9999)}"
+        sentences = [s.strip() for s in story_content.split(". ") if s.strip()]
+        
         generated_pages = []
         illustration_urls = []
 
-        for i, page in enumerate(pages):
+        for i, sentence in enumerate(sentences):
             try:
-                image_filename = f"page_{i+1}.png"
-                image_path = os.path.join(image_dir, image_filename)
-
-                print(f"Generating image for page {i+1} with prompt: '{page['image_prompt'][:50]}...'")
-                generate_image(page["image_prompt"], image_path)
-
-                # Create properly formatted URLs for frontend
-                image_url = f"/static/generated_images/{image_filename}"
+                # Generate image with conflict handling
+                image_url = assets_manager.save_image(
+                    story_id=story_id,
+                    image_url=f"https://image.pollinations.ai/prompt/{sentence}"
+                )
+                generated_pages.append({"image": image_url, "text": sentence})
                 illustration_urls.append(image_url)
-                generated_pages.append({"image": image_url, "text": page["text"]})
-
-                print(f"Generated image saved at: {image_path}")
+                
             except Exception as e:
                 print(f"Error generating image for page {i+1}: {e}")
+                generated_pages.append({"image": "/static/placeholder.png", "text": sentence})
                 illustration_urls.append("/static/placeholder.png")
-                generated_pages.append({"image": "/static/placeholder.png", "text": page["text"]})
 
         return jsonify({
+            "id": story_id,
             "title": f"{story_type} Story: {description.split()[0]}",
             "content": story_content,
             "illustration_urls": illustration_urls,
@@ -87,59 +76,54 @@ def generate_story_endpoint():
 
     except Exception as e:
         print(f"Error generating story: {str(e)}")
-        import traceback
-        traceback.print_exc()
         return jsonify({"error": f"Failed to generate story: {str(e)}"}), 500
-
 
 
 @routes.route('/save_story', methods=['POST'])
 def save_story():
     data = request.get_json()
+    required_fields = ['user_id', 'title', 'description', 'content', 'id']
     
-    # Extract fields
-    required_fields = ['user_id', 'title', 'description', 'content']
     if not all(field in data for field in required_fields):
         return jsonify({"error": "Missing required fields"}), 400
-
-    # Serialize pages array to JSON
-    pages = data.get('pages', [])
-    pages_json = json.dumps(pages)
-
-    # Build SQL query
-    query = '''
-        INSERT INTO stories 
-        (user_id, title, description, content, 
-         illustration_urls, pages, story_id, audio_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    '''
-    
-    values = (
-        data['user_id'],
-        data['title'],
-        data['description'],
-        data['content'],
-        ",".join(data.get('illustrations', [])),
-        pages_json,
-        data.get('id'),
-        data.get('audio_url', '')
-    )
 
     try:
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
-        cursor.execute(query, values)
+        
+        cursor.execute('''
+            INSERT INTO stories 
+            (user_id, title, description, moral, content, 
+            illustration_urls, story_id, audio_url, pages)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            data['user_id'],
+            data['title'],
+            data['description'],
+            data.get('moral', ''),  # Add moral here
+            data['content'],
+            ",".join(data.get('illustrations', [])),
+            data.get('id'),
+            data.get('audio_url', ''),
+            json.dumps(data.get('pages', []))
+        ))
+        
         conn.commit()
         return jsonify({
             "message": "Story saved successfully!",
-            "id": cursor.lastrowid
+            "id": cursor.lastrowid,
+            "story_id": data['id']
         })
+        
     except sqlite3.Error as e:
-        return jsonify({"error": f"Database error: {str(e)}"}), 500
+        print(f"Database error: {e}")
+        return jsonify({"error": f"Database error: {e}"}), 500
+    except Exception as e:
+        print(f"General error: {e}")
+        return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
     finally:
         if conn:
             conn.close()
-
 
 
 @routes.route('/get_stories', methods=['GET'])
@@ -180,72 +164,51 @@ def get_stories():
 
 @routes.route('/story/<int:story_id>', methods=['GET'])
 def get_story_by_id(story_id):
-    """
-    Endpoint to fetch a single story by its ID.
-    """
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     
     cursor.execute('''
-        SELECT id, title, description, content, illustration_urls FROM stories WHERE id=?
+        SELECT id, title, description, content, 
+               illustration_urls, pages
+        FROM stories 
+        WHERE id=?
     ''', (story_id,))
     
     story = cursor.fetchone()
-    
     conn.close()
-    
+
     if not story:
         return jsonify({"error": "Story not found"}), 404
-    
+
     return jsonify({
         "id": story[0],
         "title": story[1],
         "description": story[2],
         "content": story[3],
-        "illustration_urls": story[4].split(",")  # Convert back to list
+        "illustration_urls": story[4].split(",") if story[4] else [],
+        "pages": json.loads(story[5]) if story[5] else []  # Deserialize pages
     })
 
 
 @routes.route('/generate_tts', methods=['POST'])
 def generate_tts():
-    """
-    Endpoint to generate Text-to-Speech (TTS) audio for a story.
-    Expected input: JSON with 'text' and 'id'.
-    """
     data = request.get_json()
     text = data.get('text')
-    story_id = data.get('id')  # Story ID is required
+    story_id = data.get('id')
     
-    if not text:
-        return jsonify({"error": "Text is required"}), 400
-    
-    # Generate a unique story ID if not provided
-    if not story_id:
-        story_id = f"story_{int(time.time())}_{random.randint(1000, 9999)}"
-        print(f"Generated unique story ID for audio: {story_id}")
+    if not text or not story_id:
+        return jsonify({"error": "Text and story ID are required"}), 400
 
     try:
-        # Create a folder for the current story ID using the same structure as generate_story
-        audio_dir = f"D:/Ahh/Projects/story/backend/static/stories/{story_id}"
-        os.makedirs(audio_dir, exist_ok=True)
-        
-        print(f"Generating audio for story ID: {story_id}")
-        print(f"Audio directory: {audio_dir}")
-
-        # Generate TTS audio using gTTS
-        tts = gTTS(text)
-        audio_path = os.path.join(audio_dir, "story_audio.mp3")
-        tts.save(audio_path)
-
-        print(f"Audio generated at: {audio_path}")
-
-        # Return the audio file URL with the updated path structure
-        audio_url = f"/static/stories/{story_id}/story_audio.mp3"
+        # Generate audio with conflict handling
+        audio_url = assets_manager.save_audio(
+            story_id=story_id,
+            tts_text=text
+        )
         return jsonify({"audio_url": audio_url, "id": story_id})
+    
     except Exception as e:
-        print(f"Error generating TTS: {e}")
-        import traceback
-        traceback.print_exc()
+        print(f"Error generating TTS: {str(e)}")
         return jsonify({"error": f"Failed to generate TTS: {str(e)}"}), 500
   
 @routes.route('/generate_quiz', methods=['POST'])
@@ -290,10 +253,8 @@ def generate_quiz():
         print(f"Error generating quiz: {e}")
         return jsonify({"error": "Failed to generate quiz"}), 500
     
-@routes.route('/static/generated_images/<path:filename>')
-def serve_generated_image(filename):
-    return send_from_directory(
-        'static/generated_images', 
-        filename,
-        mimetype='image/png'
-    )
+
+@routes.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory("static", filename)
+

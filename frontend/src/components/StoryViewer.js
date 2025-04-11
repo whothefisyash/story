@@ -1,3 +1,5 @@
+// D:\Ahh\Projects\story\frontend\src\components\StoryViewer.js
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
@@ -22,24 +24,16 @@ function StoryViewer() {
     const fetchStory = async () => {
       try {
         const response = await axios.get(`http://127.0.0.1:5000/story/${id}`);
+        console.log("API Response:", response.data); // Log full API response
         setStory(response.data);
-        
-        // Generate quiz questions based on story content
-        const quizResponse = await axios.post("http://127.0.0.1:5000/generate_quiz", {
-          content: response.data.content,
-          moral: response.data.moral,
-          description: response.data.description,
-        });
-        console.log("Quiz Questions:", quizResponse.data.questions); // Debugging line
-        setQuizQuestions(quizResponse.data.questions);
-
       } catch (error) {
-        console.error("Error fetching story or quiz:", error);
+        console.error("Error fetching story:", error);
       }
     };
-
     fetchStory();
   }, [id]);
+  
+  
 
 
   const handleAnswerSelect = (questionIndex, selectedOption) => {
@@ -139,25 +133,36 @@ function StoryViewer() {
       <h1>{story.title}</h1>
 
       <HTMLFlipBook width={400} height={500} className="storybook">
-        {pages.map((page, index) => (
-          <div key={index} className="storybook-page">
-            <div className="left-page">
-              <img 
-                src={`http://127.0.0.1:5000${page.image}`} 
-                alt={`Illustration ${index + 1}`}
-                onError={(e) => {
-                  console.error("Failed to load image:", page.image);
-                  e.target.onerror = null;
-                  e.target.src = "http://127.0.0.1:5000/static/placeholder.png";
-                }}
-              />
+        {(story.pages || []).map((page, index) => { // Safely handle undefined pages
+          const imageUrl = page.image 
+            ? `http://127.0.0.1:5000${page.image}`
+            : "http://127.0.0.1:5000/static/placeholder.png";
+
+          console.log(`Rendering page ${index + 1}:`, imageUrl); // Debug log
+
+          return (
+            <div key={index} className="storybook-page">
+              <div className="left-page">
+                <img 
+                  src={imageUrl} 
+                  alt={`Page ${index + 1}`}
+                  onError={(e) => {
+                    console.error("Failed to load image:", imageUrl);
+                    e.target.onerror = null;
+                    e.target.src = "http://127.0.0.1:5000/static/placeholder.png";
+                  }}
+                />
+              </div>
+              <div className="right-page">
+                <p>{page.text || "Page content missing"}</p>
+              </div>
             </div>
-            <div className="right-page">
-              <p>{page.text}</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </HTMLFlipBook>
+
+
+
 
 
 

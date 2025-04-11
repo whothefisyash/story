@@ -1,3 +1,5 @@
+// D:\Ahh\Projects\story\frontend\src\components\CreateStory.js
+
 import React, { useState } from "react";
 import axios from "axios";
 import "./CreateStory.css";
@@ -39,12 +41,14 @@ function CreateStory() {
       await axios.post("http://localhost:5000/save_story", {
         user_id: 1,
         title: generatedStory.title,
-        description,
-        content: generatedStory.pages.map((page) => page.text).join(". "),
+        description: description, // Use original description
+        content: generatedStory.content, // Use full story content
         id: generatedStory.id,
-        illustrations: generatedStory.pages.map((page) => page.image),
-        audio_url: generatedStory.audio_url || "",
+        illustrations: generatedStory.illustration_urls,
+        pages: generatedStory.pages, // Add this line
+        audio_url: generatedStory.audio_url || ""
       });
+
 
       alert("Story saved successfully!");
       setIsSaved(true);
@@ -124,3 +128,4 @@ function CreateStory() {
 }
 
 export default CreateStory;
+ 
