@@ -56,31 +56,25 @@ function StoryViewer() {
 
   const handleGenerateAudio = async () => {
     try {
-      console.log("Generating audio for:", story.content);
-      const response = await axios.post(
+      await axios.post(
         "http://127.0.0.1:5000/generate_tts",
-        { text: story.content },
-        { responseType: 'blob' }
+        { text: story.content }
       );
-      
-      // Create a URL for the audio file and set it in state
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      setAudioUrl(url);
-      
-      // Initialize audio object
-      const newAudio = new Audio(url);
+      const audioUrlFromServer = `http://127.0.0.1:5000/generated_audio/story_audio.mp3`;
+      setAudioUrl(audioUrlFromServer);
+  
+      // Create a new Audio object with the new URL
+      const newAudio = new Audio(audioUrlFromServer);
       newAudio.playbackRate = speed;
       setAudio(newAudio);
-      
+  
       alert("Audio generated successfully!");
     } catch (error) {
       console.error("Error generating TTS:", error);
-      if (error.response) {
-        console.error("Server error:", error.response.data);
-      }
       alert("Failed to generate audio. Please try again.");
     }
   };
+  
   
   const handlePlayAudio = () => {
     if (audio) {

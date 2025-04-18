@@ -6,11 +6,14 @@ import requests
 from gtts import gTTS
 
 class StoryAssetsManager:
-    def __init__(self, base_path=None):
+    def __init__(self, base_path=None,audio_dir=None):
         """
         Manages storage of story assets with conflict-safe filenames.
         """
         self.base_path = base_path or "D:/Ahh/Projects/story/backend/static"
+        self.audio_dir = audio_dir or "D:/Ahh/Projects/story/backend/generated_audio"
+        os.makedirs(self.audio_dir, exist_ok=True)
+
 
     def get_story_dir(self, story_id):
         """Create and return a sanitized directory path for a story"""
@@ -50,31 +53,16 @@ class StoryAssetsManager:
 
         return f"/static/{sanitized_id}/{final_filename}"
 
-    def save_audio(self, story_id, audio_data=None, tts_text=None):
+    def save_audio_global(self, tts_text):
         """
-        Save audio with conflict-safe filenames.
-        Returns URL path like: /static/{sanitized_story_id}/story_audio_1698765300_1.mp3
+        Save audio to a single, fixed location (always overwritten).
+        Returns the URL for frontend access.
         """
-        story_dir, sanitized_id = self.get_story_dir(story_id)
-
-        # Generate unique filename
-        base_name = f"story_audio_{int(time.time())}"
-        extension = "mp3"
-        counter = 1
-
-        final_filename = f"{base_name}.{extension}"
-        while os.path.exists(os.path.join(story_dir, final_filename)):
-            final_filename = f"{base_name}_{counter}.{extension}"
-            counter += 1
-
-        # Save the file
-        audio_path = os.path.join(story_dir, final_filename)
-        if tts_text:
-            self._generate_tts(tts_text, audio_path)
-        elif audio_data:
-            self._save_binary_data(audio_data, audio_path)
-
-        return f"/static/{sanitized_id}/{final_filename}"
+        audio_filename = "story_audio.mp3"
+        audio_path = os.path.join(self.audio_dir, audio_filename)
+        tts = gTTS(tts_text)
+        tts.save(audio_path)
+        return f"/generated_audio/{audio_filename}"
 
     def clean_temp_assets(self, older_than_hours=24):
         """Clean up temporary assets older than specified hours"""

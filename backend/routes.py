@@ -12,6 +12,7 @@ import json
 from utils.story_generator import generate_story
 from utils.image_generator import generate_image
 from utils.storage_manager import StoryAssetsManager
+assets_manager=StoryAssetsManager()
 
 import sqlite3
 DATABASE = "skibidi_story.db"
@@ -20,7 +21,6 @@ DATABASE = "skibidi_story.db"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 GENERATED_IMAGES_DIR = os.path.join(BASE_DIR, "../generated_images")
 
-assets_manager=StoryAssetsManager()
 
 # Create a Blueprint for routes
 routes = Blueprint('routes', __name__)
@@ -194,19 +194,12 @@ def get_story_by_id(story_id):
 def generate_tts():
     data = request.get_json()
     text = data.get('text')
-    story_id = data.get('id')
-    
-    if not text or not story_id:
-        return jsonify({"error": "Text and story ID are required"}), 400
+    if not text:
+        return jsonify({"error": "Text is required"}), 400
 
     try:
-        # Generate audio with conflict handling
-        audio_url = assets_manager.save_audio(
-            story_id=story_id,
-            tts_text=text
-        )
-        return jsonify({"audio_url": audio_url, "id": story_id})
-    
+        audio_url = assets_manager.save_audio_global(tts_text=text)
+        return jsonify({"audio_url": audio_url})
     except Exception as e:
         print(f"Error generating TTS: {str(e)}")
         return jsonify({"error": f"Failed to generate TTS: {str(e)}"}), 500
@@ -258,3 +251,6 @@ def generate_quiz():
 def serve_static(filename):
     return send_from_directory("static", filename)
 
+@routes.route('/generated_audio/<path:filename>')
+def serve_generated_audio(filename):
+    return send_from_directory("generated_audio", filename)
