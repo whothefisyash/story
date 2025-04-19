@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request
 from flask import send_from_directory
 from flask import send_file
 from flask_cors import cross_origin
+from flask import render_template, make_response
 
 from gtts import gTTS
 import os
@@ -11,6 +12,8 @@ import random
 import time
 import json
 import requests
+import pdfkit
+import io
 
 from utils.story_generator import generate_story
 from utils.image_generator import generate_image
@@ -253,3 +256,25 @@ def generate_instagram_post():
     except Exception as e:
         print(f"Error generating Instagram post: {str(e)}")
         return jsonify({"error": f"Post generation failed: {str(e)}"}), 500
+    
+
+@routes.route('/download_book_pdf', methods=['POST'])
+def download_book_pdf():
+    data = request.get_json()
+    title = data.get('title', 'Skibidi Story')
+    pages = data.get('pages', [])
+
+    # Add explicit wkhtmltopdf path
+    config = pdfkit.configuration(wkhtmltopdf=r"D:\wkhtmltox-0.12.6-1.mxe-cross-win64\wkhtmltox\bin\wkhtmltopdf.exe")
+    
+    # Render HTML
+    rendered = render_template('book_template.html', title=title, pages=pages)
+    
+    # Generate PDF with configuration
+    pdf = pdfkit.from_string(rendered, False, configuration=config)
+
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename="{title}.pdf"'
+    return response
+

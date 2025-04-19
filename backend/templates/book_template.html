@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ title }}</title>
+    <style>
+        body { font-family: "Arial", sans-serif; margin: 40px; }
+        h1 { color: #4a4a8c; }
+        .page { page-break-after: always; }
+        img { max-width: 100%; border-radius: 10px; margin-bottom: 20px; }
+        .text { margin-bottom: 40px; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    {% for page in pages %}
+        <div class="page">
+            {% if page.image %}
+                <img src="http://localhost:5000{{ page.image }}">
+            {% endif %}
+            <div class="text">{{ page.text }}</div>
+        </div>
+    {% endfor %}
+</body>
+</html>

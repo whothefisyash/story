@@ -34,6 +34,9 @@ function StoryViewer() {
     fetchStory();
   }, [id]);
   
+
+
+
   const handleGenerateQuiz = async () => {
     if (!story?.content) return;
     
@@ -132,6 +135,32 @@ function StoryViewer() {
 
   if (!story) return <div>Loading...</div>;
 
+  const handleDownloadPdf = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/download_book_pdf",
+        {
+          title: story.title,
+          pages: story.pages || pages, // fallback to pages constructed from sentences if needed
+        },
+        { responseType: "blob" }
+      );
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${story.title || "story"}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Failed to download PDF");
+    }
+  };
+  
+
+
+
   
   const sentences = story.content.split(". ");
   const pages = sentences.map((text, index) => ({
@@ -173,6 +202,9 @@ function StoryViewer() {
         })}
       </HTMLFlipBook>
 
+      <button onClick={handleDownloadPdf} className="download-pdf-btn">
+        Download as PDF
+      </button>
 
 
 

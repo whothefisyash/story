@@ -1,54 +1,54 @@
 .story-viewer {
   padding: 20px;
-  background-color: #f0f4ff; /* Light blue background */
-  min-height: 100vh; /* Full height for the page */
+  background-color: #f0f4ff; 
+  min-height: 100vh; 
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .story-viewer h1 {
-  font-size: 32px; /* Slightly larger font for better readability */
-  color: #4a4a8c; /* Dark purple */
+  font-size: 32px; 
+  color: #4a4a8c; 
   text-align: center;
-  margin-bottom: 30px; /* Increased spacing below the title */
+  margin-bottom: 30px; 
 }
 
 .story-viewer img {
   display: block;
   margin: auto;
-  max-width: 90%; /* Increased width for larger images */
-  max-height: 400px; /* Limit height to prevent overflow */
-  border-radius: 15px; /* Rounded corners for a modern look */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow effect */
+  max-width: 90%; 
+  max-height: 400px; 
+  border-radius: 15px; 
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .story-viewer p {
-  font-size: 20px; /* Larger font size for better readability */
-  color: #4a4a8c; /* Dark purple */
+  font-size: 20px; 
+  color: #4a4a8c; 
   text-align: justify;
   margin-top: 20px;
-  line-height: 1.6; /* Improved line spacing for readability */
+  line-height: 1.6; 
 }
 
 @media (max-width: 768px) {
   .story-viewer img {
-    max-width: 100%; /* Adjust image width for smaller screens */
-    max-height: auto; /* Allow image height to adjust dynamically */
-    border-radius: 10px; /* Slightly smaller rounded corners on mobile */
+    max-width: 100%; 
+    max-height: auto; 
+    border-radius: 10px; 
   }
 
   .story-viewer h1 {
-    font-size: 24px; /* Smaller font size for smaller screens */
+    font-size: 24px; 
     margin-bottom: 20px;
   }
 
   .story-viewer p {
-    font-size: 16px; /* Adjust text size for smaller screens */
+    font-size: 16px;
     line-height: 1.4;
     margin-top: 15px;
-    padding: 10px; /* Add padding for better spacing on mobile devices */
-    text-align: left; /* Align text to left on smaller screens */
+    padding: 10px; 
+    text-align: left; 
  }
 }
 
@@ -253,4 +253,20 @@
 }
 .correct-answer {
   color: #405de6;
+}
+
+.download-pdf-btn {
+  background: #405de6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 12px 28px;
+  margin: 24px 0 10px 0;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px rgba(64,93,230,0.10);
+}
+.download-pdf-btn:hover {
+  background: #3143b2;
 }
