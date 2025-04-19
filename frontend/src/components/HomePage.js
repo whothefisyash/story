@@ -6,10 +6,10 @@ function HomePage() {
     <div className="homepage">
       <div className="hero-section">
         <h1>Welcome to Skibidi Stories</h1>
-        <p>Discover, create, and share amazing stories with the world!</p>
+        <p>Create amazing stories or INstagram posts!</p>
         <div className="button-group">
           <a href="/create-story" className="btn primary-btn">Create a Story</a>
-          <a href="/dashboard" className="btn secondary-btn">Explore Stories</a>
+          <a href="/create-instagram" className="btn secondary-btn">Create Instagram Post</a>
         </div>
       </div>
       <div className="features-section">

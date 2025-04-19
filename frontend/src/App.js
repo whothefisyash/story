@@ -6,6 +6,7 @@ import StoryViewer from "./components/StoryViewer";
 import CreateStory from "./components/CreateStory";
 import HomePage from "./components/HomePage";
 import ContactPage from "./components/ContactPage";
+import InstagramGenerator from './components/InstagramGenerator';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/story/:id" element={<StoryViewer />} />
         <Route path="/create-story" element={<CreateStory />} />
         <Route path="/contact-us" element={<ContactPage />} />
+        <Route path="/create-instagram" element={<InstagramGenerator />} />
       </Routes>
     </Router>
   );

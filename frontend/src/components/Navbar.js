@@ -11,6 +11,7 @@ function Navbar() {
       <ul className="nav-links">
         <li><Link to="/">Home</Link></li>
         <li><Link to="/create-story">Create Story</Link></li>
+        <li><Link to="/create-instagram">Generate Caption</Link></li>
         <li><Link to="/dashboard">Explore Stories</Link></li>
         <li><Link to="/contact-us">Contact Us</Link></li>
       </ul>

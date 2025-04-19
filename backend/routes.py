@@ -8,11 +8,18 @@ import os
 import random
 import time
 import json
+import requests
 
 from utils.story_generator import generate_story
 from utils.image_generator import generate_image
 from utils.storage_manager import StoryAssetsManager
+
 assets_manager=StoryAssetsManager()
+
+from utils.instagram import InstagramGenerator
+from dotenv import load_dotenv
+
+load_dotenv()
 
 import sqlite3
 DATABASE = "skibidi_story.db"
@@ -254,3 +261,18 @@ def serve_static(filename):
 @routes.route('/generated_audio/<path:filename>')
 def serve_generated_audio(filename):
     return send_from_directory("generated_audio", filename)
+
+@routes.route('/generate-instagram', methods=['POST'])
+def generate_instagram_post():
+    data = request.get_json()
+    user_text = data.get('text')
+    if not user_text:
+        return jsonify({"error": "Text input is required"}), 400
+
+    try:
+        generator = InstagramGenerator()
+        post_data = generator.create_instagram_post(user_text)
+        return jsonify(post_data)
+    except Exception as e:
+        print(f"Error generating Instagram post: {str(e)}")
+        return jsonify({"error": f"Post generation failed: {str(e)}"}), 500
