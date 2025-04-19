@@ -3,6 +3,8 @@
 from flask import Blueprint, jsonify, request
 from flask import send_from_directory
 from flask import send_file
+from flask_cors import cross_origin
+
 from gtts import gTTS
 import os
 import random
@@ -20,6 +22,8 @@ from utils.instagram import InstagramGenerator
 from dotenv import load_dotenv
 
 load_dotenv()
+
+from utils.quiz import generate_quiz_from_story
 
 import sqlite3
 DATABASE = "skibidi_story.db"
@@ -211,47 +215,20 @@ def generate_tts():
         print(f"Error generating TTS: {str(e)}")
         return jsonify({"error": f"Failed to generate TTS: {str(e)}"}), 500
   
-@routes.route('/generate_quiz', methods=['POST'])
+@routes.route('/generate-quiz', methods=['POST'])
+@cross_origin()  # Apply CORS to this specific route
 def generate_quiz():
-    """
-    Endpoint to generate interactive quiz questions for a story.
-    Expected input: JSON with 'content', 'moral', and 'description'.
-    """
     data = request.get_json()
-    content = data.get('content')
-    moral = data.get('moral')
-    description = data.get('description')
-
-    if not all([content, moral, description]):
-        return jsonify({"error": "Missing required fields"}), 400
-
+    story_content = data.get('story_content')
+    
+    if not story_content:
+        return jsonify({"error": "Story content is required"}), 400
+    
     try:
-        # Extract keywords and generate questions
-        keywords = random.sample(content.split(), min(5, len(content.split())))
-        main_character = description.split()[0]  # Assume first word of description is the main character
-
-        questions = [
-            {
-                "question": f"What is the moral of the story?",
-                "options": [moral, "Always tell lies", "Never help others"],
-                "answer": moral
-            },
-            {
-                "question": f"What does '{keywords[0]}' mean?",
-                "options": ["Meaning 1", "Meaning 2", "Meaning 3"],
-                "answer": "Meaning 1"
-            },
-            {
-                "question": f"Who is the main character in the story?",
-                "options": [main_character, "Harry", "John"],
-                "answer": main_character
-            }
-        ]
-
-        return jsonify({"questions": questions})
+        quiz = generate_quiz_from_story(story_content)
+        return jsonify({"quiz": quiz})
     except Exception as e:
-        print(f"Error generating quiz: {e}")
-        return jsonify({"error": "Failed to generate quiz"}), 500
+        return jsonify({"error": str(e)}), 500
     
 
 @routes.route('/static/<path:filename>')

@@ -18,7 +18,8 @@ function StoryViewer() {
 
   const [quizQuestions, setQuizQuestions] = useState([]);
   const [selectedAnswers, setSelectedAnswers] = useState({});
-  const [results, setResults] = useState(null); // To store quiz results
+  const [results, setResults] = useState(null);
+  const [quizLoading, setQuizLoading] = useState(false);
 
   useEffect(() => {
     const fetchStory = async () => {
@@ -33,7 +34,24 @@ function StoryViewer() {
     fetchStory();
   }, [id]);
   
-  
+  const handleGenerateQuiz = async () => {
+    if (!story?.content) return;
+    
+    setQuizLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/generate-quiz",
+        { story_content: story.content }
+      );
+      setQuizQuestions(response.data.quiz || []);
+      setResults(null);
+      setSelectedAnswers({});
+    } catch (error) {
+      alert(error.response?.data?.error || "Failed to generate quiz");
+    } finally {
+      setQuizLoading(false);
+    }
+  };
 
 
   const handleAnswerSelect = (questionIndex, selectedOption) => {
@@ -184,44 +202,88 @@ function StoryViewer() {
         )}
       </div>
 
-      {/* Interactive Quiz Section */}
+      {/* Quiz Section */}
       <div className="quiz-section">
-        <h2>Interactive Quiz</h2>
-        {quizQuestions.map((question, index) => (
-          <div key={index} className="quiz-question">
-            <p>{question.question}</p>
-            {question.options.map((option) => (
-              <button
-                key={option}
-                onClick={() => handleAnswerSelect(index, option)}
-                className={selectedAnswers[index] === option ? "selected" : ""}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-        ))}
-        
-        {quizQuestions.length > 0 && (
-          <button onClick={handleSubmitQuiz} className="submit-quiz-btn">Submit Quiz</button>
-        )}
+        <div className="quiz-header">
+          {/* <h2>Interactive Quiz</h2> */}
+          <button 
+            onClick={handleGenerateQuiz} 
+            disabled={quizLoading || !story}
+            className="generate-quiz-btn"
+          >
+            {quizLoading ? "Generating Quiz..." : "Generate Quiz"}
+          </button>
+        </div>
 
-        {/* Display Results */}
-        {results && (
-          <div className="quiz-results">
-            <h3>Quiz Results:</h3>
-            {results.map((result, index) => (
-              <p key={index}>
-                Q: {result.question} <br />
-                Your Answer: {result.selectedAnswer} <br />
-                Correct Answer: {result.correctAnswer} <br />
-                Result: {result.isCorrect ? "Correct ✅" : "Wrong ❌"}
-              </p>
+        {quizQuestions.length > 0 && (
+          <>
+            {quizQuestions.map((question, index) => (
+              <div key={index} className="quiz-question">
+                <p>{question.question}</p>
+                <div className="quiz-options">
+                  {question.options.map((option, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleAnswerSelect(index, option)}
+                      
+                      className={`quiz-option
+                        ${
+                          results
+                            ? option === question.answer
+                              ? "correct"
+                              : selectedAnswers[index] === option && option !== question.answer
+                              ? "incorrect"
+                              : ""
+                            : selectedAnswers[index] === option
+                            ? "selected"
+                            : ""
+                        }
+                      `}
+
+
+                      disabled={!!results}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
-          </div>
+
+            {!results && (
+              <button 
+                onClick={handleSubmitQuiz}
+                className="submit-quiz-btn"
+                disabled={Object.keys(selectedAnswers).length !== quizQuestions.length}
+              >
+                Submit Quiz
+              </button>
+            )}
+
+            {results && (
+              <div className="quiz-results">
+                <h3>Quiz Results</h3>
+                <div className="score-summary">
+                  Correct Answers: {results.filter(r => r.isCorrect).length}/{quizQuestions.length}
+                </div>
+                {results.map((result, index) => (
+                  <div key={index} className="result-item">
+                    <p className="question-text">{result.question}</p>
+                    <div className="answer-comparison">
+                      <span className={`user-answer ${result.isCorrect ? "correct" : "incorrect"}`}>
+                        Your Answer: {result.selectedAnswer || "No answer"}
+                      </span>
+                      <span className="correct-answer">
+                        Correct Answer: {result.correctAnswer}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
-
     </div>
   );
 }
