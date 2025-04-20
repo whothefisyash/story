@@ -46,6 +46,22 @@ def home():
     """
     return jsonify({"message": "Welcome to Skibidi Story API!"})
 
+def generate_story_title(story_content):
+    import google.generativeai as genai
+    import os
+    genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+    prompt = (
+        "Suggest a creative, catchy, and relevant story title for the following story. "
+        "Return only the title, no extra text or quotes.\n\n"
+        f"Story:\n{story_content}"
+    )
+    model = genai.GenerativeModel('gemini-1.5-pro')
+    response = model.generate_content(prompt)
+    # Clean up the response (remove quotes, whitespace)
+    title = response.text.strip().strip('"').strip("'")
+    return title
+
+
 @routes.route('/generate_story', methods=['POST'])
 def generate_story_endpoint():
     data = request.get_json()
@@ -80,9 +96,11 @@ def generate_story_endpoint():
                 generated_pages.append({"image": "/static/placeholder.png", "text": sentence})
                 illustration_urls.append("/static/placeholder.png")
 
+        ai_title = generate_story_title(story_content)
+
         return jsonify({
             "id": story_id,
-            "title": f"{story_type} Story: {description.split()[0]}",
+            "title": ai_title,
             "content": story_content,
             "illustration_urls": illustration_urls,
             "pages": generated_pages
@@ -277,4 +295,5 @@ def download_book_pdf():
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = f'attachment; filename="{title}.pdf"'
     return response
+
 
