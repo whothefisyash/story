@@ -87,7 +87,7 @@ function InstagramGenerator() {
       {/* Input Section */}
       <div className="input-section">
         <textarea
-          placeholder="Describe your post (e.g., 'Morning coffee vibes ☕️')"
+          placeholder="Describe your post (e.g., 'Morning coffee vibes')"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
         />

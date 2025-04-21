@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 
 function Navbar() {
+  const [dark, setDark] = useState(() => localStorage.getItem("theme") === "dark");
+
+  useEffect(() => {
+    document.body.classList.toggle("dark-mode", dark);
+    localStorage.setItem("theme", dark ? "dark" : "light");
+  }, [dark]);
+
   return (
     <nav className="navbar">
       <div className="logo">
@@ -19,8 +26,15 @@ function Navbar() {
         <button className="dashboard-button">
           <Link to="/dashboard">Dashboard</Link>
         </button>
-        <div className="profile-icon">Y
-        </div>
+        <div className="profile-icon">Y</div>
+        {/* Add toggle button here */}
+        <button
+          className="theme-toggle-btn"
+          onClick={() => setDark((d) => !d)}
+          aria-label="Toggle dark mode"
+        >
+          {dark ? "🌙" : "🔆"}
+        </button>
       </div>
     </nav>
   );

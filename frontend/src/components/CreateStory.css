@@ -1,6 +1,36 @@
+:root {
+  --background: #f9f9f9;
+  --card-bg: #fff;
+  --text: #222;
+  --header: #4a4a4a;
+  --input-bg: #fff;
+  --input-border: #ddd;
+  --input-placeholder: #aaa;
+  --button-bg: #165ee5;
+  --button-text: #fff;
+  --button-hover-bg: #2575fc;
+  --shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode {
+  --background: #181a21;
+  --card-bg: #23272f;
+  --text: #efefef;
+  --header: #e0eaff;
+  --input-bg: #23272f;
+  --input-border: #555;
+  --input-placeholder: #888;
+  --button-bg: #232526;
+  --button-text: #fff;
+  --button-hover-bg: #6a11cb;
+  --shadow: 0px 4px 16px rgba(0,0,0,0.28);
+}
+
 /* General Styling */
 body {
   font-family: "Arial", sans-serif;
+  background: var(--background);
+  color: var(--text);
 }
 
 .create-story {
@@ -9,41 +39,72 @@ body {
   padding: 20px;
 }
 
-h1 {
+.create-story h1 {
   text-align: center;
   font-size: 2.5rem;
-  color: #4a4a4a;
+  color: var(--header);
 }
 
 /* Form Styling */
 .create-story-form {
-  background-color: #f9f9f9;
+  background-color: var(--card-bg);
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
 }
 
-label {
+.create-story-form label {
   display: block;
   margin-bottom: 10px;
+  color: var(--header);
 }
 
 .form-select,
 .form-textarea {
   width: calc(100% - 20px);
   margin-bottom: 20px;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 1rem;
+  transition: border 0.2s, background 0.2s;
 }
 
-.form-select {
-  padding: 10px;
-}
-
-.form-textarea {
-  padding: 10px;
+.form-select::placeholder,
+.form-textarea::placeholder {
+  color: var(--input-placeholder);
 }
 
 .btn-create,
 .btn-save {
   display: block;
-  background-color: #165ee5; /* Gradient color */
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  padding: 12px 28px;
+  border-radius: 7px;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 18px auto 0 auto;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(64,93,230,0.10);
+}
+
+.btn-create:hover,
+.btn-save:hover {
+  background-color: var(--button-hover-bg);
+  color: var(--button-text);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .create-story-form {
+    padding: 12px;
+  }
+  .create-story h1 {
+    font-size: 1.7rem;
+  }
 }
